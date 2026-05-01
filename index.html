@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>速記帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --card: #ffffff;
+    --ink: #2a2a28;
+    --ink-soft: #6b6a66;
+    --line: #e8e4dc;
+    --accent: #d97757;
+    --accent-soft: #fbe7dd;
+    --ok: #7c9c6e;
+    --warn: #c8845b;
+    --danger: #b85c4a;
+    --pill-bg: #f2efe8;
+    --pill-active-bg: #2a2a28;
+    --pill-active-ink: #fbf9f4;
+    --shadow-sm: 0 1px 2px rgba(40, 35, 28, 0.04);
+    --shadow-md: 0 4px 12px rgba(40, 35, 28, 0.06);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Noto Sans TC", "Inter", -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    overscroll-behavior-y: contain;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 14px 100px;
+    min-height: 100vh;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 4px 14px;
+    gap: 6px;
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+  .header h1 .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 8px;
+    transform: translateY(-2px);
+  }
+  .icon-btn {
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .icon-btn.active {
+    background: var(--ink);
+    color: var(--card);
+    border-color: var(--ink);
+  }
+  .icon-btn svg {
+    width: 18px; height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+  }
+
+  .card-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .card-label .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .card-label .name .zh {
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .card-label .name .req {
+    color: var(--accent);
+    margin-left: 3px;
+  }
+  .col-control {
+    display: none;
+    gap: 4px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .editing .col-control { display: flex; }
+  .col-control button {
+    width: 24px; height: 24px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    border-radius: 6px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+
+  /* ===== Inputs ===== */
+  .text-input, .date-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid var(--line);
+    padding: 8px 4px;
+    font-size: 18px;
+    font-family: inherit;
+    background: transparent;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .text-input:focus, .date-input:focus {
+    border-color: var(--accent);
+  }
+  .amount-input {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-family: "Inter", inherit;
+  }
+  .amount-input::placeholder { color: #ccc; font-weight: 400; }
+
+  .hint {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  /* ===== Pills ===== */
+  .pills { display: grid; gap: 8px; }
+  .pill {
+    background: var(--pill-bg);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--ink);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.12s;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    user-select: none;
+    word-break: break-word;
+  }
+  .pill:active { transform: scale(0.97); }
+  .pill.selected {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border-color: var(--ink);
+  }
+  .pill.other {
+    background: transparent;
+    border: 1.5px dashed var(--line);
+    color: var(--ink-soft);
+  }
+  .pill.other.selected {
+    background: var(--accent-soft);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+  }
+  .pill .custom-text {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .editing .pill { cursor: grab; }
+  .editing .pill::before {
+    content: "✕";
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 20px; height: 20px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .editing .pill.no-delete::before { display: none; }
+  .editing .pill.dragging { opacity: 0.4; }
+  .editing .pill.drag-over { border-color: var(--accent); border-style: dashed; }
+
+  .add-pill {
+    background: transparent;
+    border: 1.5px dashed var(--accent);
+    color: var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    min-height: 48px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .editing .add-pill { display: flex; }
+
+  /* ===== Submit ===== */
+  .submit-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, var(--bg) 60%, rgba(247, 245, 240, 0));
+    padding: 16px 14px 24px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .submit-bar > * { pointer-events: auto; }
+  .submit-btn {
+    width: 100%;
+    max-width: 452px;
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border: none;
+    border-radius: 999px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(40, 35, 28, 0.15);
+    transition: transform 0.1s;
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled {
+    background: var(--line);
+    color: var(--ink-soft);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(40, 35, 28, 0.4);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow: 0 20px 50px rgba(40, 35, 28, 0.25);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h3 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .modal p { margin: 0 0 14px; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .modal input, .modal textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 8px;
+  }
+  .modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-cancel { background: var(--pill-bg); color: var(--ink); }
+  .btn-confirm { background: var(--ink); color: var(--pill-active-ink); }
+  .btn-danger { background: var(--danger); color: white; }
+
+  /* ===== Preview ===== */
+  .preview-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 14px;
+  }
+  .preview-row:last-child { border: none; }
+  .preview-row .k { color: var(--ink-soft); }
+  .preview-row .v { font-weight: 500; max-width: 60%; text-align: right; word-break: break-all; }
+  .preview-row .v.empty { color: #ccc; font-style: italic; }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    z-index: 200;
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: var(--ok); }
+  .toast.error { background: var(--danger); }
+
+  /* ===== Edit hint banner ===== */
+  .edit-banner {
+    display: none;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .editing .edit-banner { display: block; }
+
+  .hidden { display: none !important; }
+
+  .card-collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    border-width: 0;
+    transition: all 0.25s ease;
+  }
+
+  /* 卡別卡片的特別樣式(展開時) */
+  .card.card-highlight {
+    background: #fef9ec;
+    border-color: #f0d997;
+    border-left: 4px solid var(--accent);
+    padding-left: 13px; /* 補回左側 1px 因為 border 變粗 */
+  }
+  .card.card-highlight .card-label .name .zh {
+    color: #8a6914;
+  }
+  .card.card-highlight .pill {
+    background: #ffffff;
+    border-color: #f0d997;
+  }
+  .card.card-highlight .pill.selected {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border-color: var(--ink);
+  }
+  .card.card-highlight .pill.other {
+    background: transparent;
+    border: 1.5px dashed #d4b76a;
+  }
+
+  /* ===== Setup Wizard ===== */
+  .wizard {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .wizard h2 {
+    font-size: 24px;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  .wizard .subtitle {
+    color: var(--ink-soft);
+    margin-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .wizard .step {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--line);
+    margin-bottom: 14px;
+  }
+  .wizard .step h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wizard .step .num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", inherit;
+  }
+  .wizard .step.done .num { background: var(--ok); }
+  .wizard .step.done .num::before { content: "✓"; }
+  .wizard .step.done .num span { display: none; }
+  .wizard .step p { margin: 6px 0 12px; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+  .wizard input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 8px;
+  }
+  .wizard input:focus { border-color: var(--accent); }
+  .wizard .step button {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .wizard .step button:disabled {
+    background: var(--line);
+    color: var(--ink-soft);
+    cursor: not-allowed;
+  }
+  .wizard .step button.secondary {
+    background: var(--pill-bg);
+    color: var(--ink);
+  }
+  .wizard .step .btn-row { display: flex; gap: 8px; }
+  .wizard .step .status {
+    font-size: 12px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .wizard .step .status.ok { background: #e8f0e3; color: var(--ok); }
+  .wizard .step .status.error { background: #f8e0db; color: var(--danger); }
+
+  /* ===== Lock Screen ===== */
+  .lock {
+    max-width: 360px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .lock .icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .lock h2 { margin: 0 0 8px; font-size: 22px; }
+  .lock p { color: var(--ink-soft); margin: 0 0 24px; font-size: 14px; }
+  .lock button {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border: none;
+    padding: 14px 24px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .lock button.secondary {
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .lock input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .lock input:focus { border-color: var(--accent); }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid currentColor;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============================
+     設定精靈(首次使用)
+     ============================ -->
+<div class="wizard hidden" id="wizard">
+  <h2>初次設定</h2>
+  <p class="subtitle">跟著 3 步完成設定。完成後就不用再做這些了。</p>
+
+  <div class="step" id="step-url">
+    <h3><span class="num"><span>1</span></span>Apps Script 網址</h3>
+    <p>從 Apps Script 「部署為網頁應用程式」拿到的網址,看起來像 <code style="font-size:11px;background:#f2efe8;padding:2px 5px;border-radius:4px;">https://script.google.com/macros/s/.../exec</code></p>
+    <input type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+    <div class="btn-row">
+      <button onclick="testConnection()">測試連線</button>
+    </div>
+    <div class="status hidden" id="setupUrlStatus"></div>
+  </div>
+
+  <div class="step" id="step-password">
+    <h3><span class="num"><span>2</span></span>密碼</h3>
+    <p>輸入你在 Code.gs 設定的同一組密碼。日後忘記密碼可以從設定頁查看。</p>
+    <input type="password" id="setupPwd" placeholder="自己設的密碼" autocomplete="new-password">
+    <input type="password" id="setupPwd2" placeholder="再輸入一次確認" autocomplete="new-password">
+  </div>
+
+  <div class="step" id="step-bio">
+    <h3><span class="num"><span>3</span></span>生物辨識(選用)</h3>
+    <p id="bioDesc">用指紋或臉解鎖,登出後重開 App 時會用到。不支援的話會自動用密碼。</p>
+    <div class="btn-row">
+      <button onclick="setupBiometric()" id="bioBtn">註冊指紋/臉</button>
+      <button onclick="skipBiometric()" class="secondary">略過</button>
+    </div>
+    <div class="status hidden" id="setupBioStatus"></div>
+  </div>
+
+  <button onclick="finishSetup()" id="finishBtn" disabled style="background:var(--accent); color:white; border:none; padding:14px; border-radius:999px; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; margin-top:8px;">
+    完成設定,開始使用
+  </button>
+</div>
+
+<!-- ============================
+     鎖定畫面(登出後重開時)
+     ============================ -->
+<div class="lock hidden" id="lockScreen">
+  <div class="icon">🔒</div>
+  <h2>速記帳</h2>
+  <p id="lockHint">解鎖後可以開始記帳</p>
+  <button id="lockBioBtn" onclick="unlockWithBio()">使用指紋/臉解鎖</button>
+  <button class="secondary" onclick="showPasswordUnlock()">改用密碼解鎖</button>
+
+  <div class="hidden" id="lockPwdSection" style="margin-top:12px; width:100%;">
+    <input type="password" id="lockPwd" placeholder="輸入密碼" autocomplete="current-password">
+    <button onclick="unlockWithPassword()">解鎖</button>
+  </div>
+</div>
+
+<!-- ============================
+     主 App
+     ============================ -->
+<div class="app hidden" id="app">
+
+  <div class="header">
+    <h1><span class="dot"></span>速記帳</h1>
+    <button class="icon-btn" id="editBtn" onclick="toggleEdit()" title="編輯選項">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+    </button>
+    <button class="icon-btn" onclick="openSettings()" title="設定">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <div class="edit-banner">
+    編輯模式:點 ✕ 刪除、長按拖曳排序、用 - / + 調整每行顯示數量、最下方可新增項目
+  </div>
+
+  <!-- 補登日期 + 金額 -->
+  <div class="card">
+    <div class="card-label"><span class="name"><span class="zh">補登日期</span></span></div>
+    <input type="date" class="date-input" id="dateInput">
+    <div class="hint">空白 = 今天(由試算表時間戳記決定)</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label"><span class="name"><span class="zh">金額</span><span class="req">*</span></span></div>
+    <input type="number" inputmode="numeric" class="text-input amount-input" id="amountInput" placeholder="0">
+  </div>
+
+  <!-- 帳目 -->
+  <div class="card" data-field="account">
+    <div class="card-label">
+      <span class="name"><span class="zh">帳目</span><span class="req">*</span></span>
+      <div class="col-control">
+        每行 <button onclick="adjustCols('account', -1)">−</button>
+        <span id="cols-account">3</span>
+        <button onclick="adjustCols('account', 1)">+</button>
+      </div>
+    </div>
+    <div class="pills" id="pills-account"></div>
+  </div>
+
+  <!-- 類別 -->
+  <div class="card" data-field="category">
+    <div class="card-label">
+      <span class="name"><span class="zh">類別</span><span class="req">*</span></span>
+      <div class="col-control">
+        每行 <button onclick="adjustCols('category', -1)">−</button>
+        <span id="cols-category">3</span>
+        <button onclick="adjustCols('category', 1)">+</button>
+      </div>
+    </div>
+    <div class="pills" id="pills-category"></div>
+  </div>
+
+  <!-- 支付方式 -->
+  <div class="card" data-field="payment">
+    <div class="card-label">
+      <span class="name"><span class="zh">支付方式</span><span class="req">*</span></span>
+      <div class="col-control">
+        每行 <button onclick="adjustCols('payment', -1)">−</button>
+        <span id="cols-payment">3</span>
+        <button onclick="adjustCols('payment', 1)">+</button>
+      </div>
+    </div>
+    <div class="pills" id="pills-payment"></div>
+  </div>
+
+  <!-- 卡別 -->
+  <div class="card card-highlight" id="cardCard" data-field="card">
+    <div class="card-label">
+      <span class="name"><span class="zh">卡別</span></span>
+      <div class="col-control">
+        每行 <button onclick="adjustCols('card', -1)">−</button>
+        <span id="cols-card">3</span>
+        <button onclick="adjustCols('card', 1)">+</button>
+      </div>
+    </div>
+    <div class="pills" id="pills-card"></div>
+  </div>
+
+  <!-- 備註 -->
+  <div class="card" data-field="note">
+    <div class="card-label">
+      <span class="name"><span class="zh">備註</span></span>
+      <div class="col-control">
+        每行 <button onclick="adjustCols('note', -1)">−</button>
+        <span id="cols-note">3</span>
+        <button onclick="adjustCols('note', 1)">+</button>
+      </div>
+    </div>
+    <div class="pills" id="pills-note"></div>
+  </div>
+
+</div>
+
+<div class="submit-bar hidden" id="submitBar">
+  <button class="submit-btn" id="submitBtn" onclick="submit()">預覽 & 送出</button>
+</div>
+
+<!-- Modal: 自由輸入 -->
+<div class="modal-overlay" id="textModal">
+  <div class="modal">
+    <h3 id="modalTitle">輸入內容</h3>
+    <p id="modalDesc">請輸入文字</p>
+    <input type="text" id="modalInput" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-confirm" onclick="confirmModal()">確認</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 預覽 -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal">
+    <h3>確認資料</h3>
+    <p>送出前再檢查一次:</p>
+    <div id="previewBody"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePreview()">回去修改</button>
+      <button class="btn-confirm" id="finalSubmitBtn" onclick="finalSubmit()">確定送出</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 設定頁 -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <h3>設定</h3>
+    <p>系統設定與帳戶資訊。</p>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin: 14px 0;">
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="showUrlEdit()">
+        🔗 修改 Apps Script 網址
+      </button>
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="showPasswordView()">
+        🔑 查看 / 修改密碼
+      </button>
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="reregisterBio()">
+        👆 重新註冊生物辨識
+      </button>
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="confirmLogout1()">
+        🚪 登出
+      </button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="closeSettings()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 確認登出(第二次) -->
+<div class="modal-overlay" id="logoutConfirmModal">
+  <div class="modal">
+    <h3>確定要登出嗎?</h3>
+    <p>登出後下次開啟需要用指紋或密碼重新解鎖。<br>(設定和選項不會被清除)</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLogoutConfirm()">取消</button>
+      <button class="btn-danger" onclick="doLogout()">確定登出</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 通用設定編輯 -->
+<div class="modal-overlay" id="editSettingModal">
+  <div class="modal">
+    <h3 id="editSettingTitle">編輯</h3>
+    <p id="editSettingDesc"></p>
+    <input type="text" id="editSettingInput">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditSetting()">取消</button>
+      <button class="btn-confirm" onclick="saveEditSetting()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================
+   常數
+   ============================ */
+const STORAGE_CONFIG = "ql.config.v1";
+const STORAGE_AUTH = "ql.auth.v1";       // {endpoint, password, bioCredId}
+const STORAGE_SESSION = "ql.session.v1"; // sessionStorage: 已解鎖標記
+
+const DEFAULT_DATA = {
+  account: {
+    cols: 3,
+    options: ["必要", "非必要", "投存"]
+  },
+  category: {
+    cols: 3,
+    options: [
+      "1🍖三餐", "2🍫零食", "3🍻聚餐",
+      "4👫生活交友", "5💇‍♀️理髮置裝", "6📱3C娛樂",
+      "7⚽運動休閒", "8🛵交通油錢", "9🔷其他",
+      "🌱收入", "⛏️投存", "A🛍️墊支",
+      "B💼專案1", "B💼專案2", "B💼專案3",
+      "B💼專案4", "B💼專案5", "C💊保險稅務"
+    ]
+  },
+  payment: {
+    cols: 3,
+    options: [
+      "💰OPEN錢包", "💰全盈PAY", "💰全支付",
+      "🟥街口", "📱Samsung Pay", "💳信用卡",
+      "💰現金", "💸轉帳", "🟦悠遊卡(GOGO)",
+      "🟦悠遊卡(手機)", "📱臺灣pay", "📱Rchart Life",
+      "📱玉山Wallet", "📱Google Pay", "📱LinePay",
+      "📱台新Pay"
+    ]
+  },
+  card: {
+    cols: 3,
+    options: ["KOKO", "GOGO", "FlyGO", "Ubear", "國旅", "太陽", "玫瑰Giving"]
+  },
+  note: {
+    cols: 3,
+    options: ["小七", "全家", "麥當勞", "肯德基", "摩斯", "呷尚寶", "積分賽報名費", "自助餐", "中熱拿", "三年13班早餐", "氣泡水", "大熱拿"]
+  }
+};
+
+/* ============================
+   狀態
+   ============================ */
+let state = loadState();
+let auth = loadAuth();
+let selected = blankSelection();
+let isEditing = false;
+let modalContext = null;
+let setupState = { url: null, urlOk: false, password: null, bioCredId: null };
+
+function blankSelection() {
+  return {
+    account: null, category: null, payment: null,
+    card: null, note: null,
+    noteCustom: "", paymentCustom: "", categoryCustom: ""
+  };
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_CONFIG);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const merged = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      for (const k of Object.keys(parsed)) {
+        if (merged[k]) merged[k] = parsed[k];
+      }
+      return merged;
+    }
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_CONFIG, JSON.stringify(state)); } catch (e) {}
+}
+
+function loadAuth() {
+  try {
+    const saved = localStorage.getItem(STORAGE_AUTH);
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return null;
+}
+function saveAuth(a) {
+  auth = a;
+  localStorage.setItem(STORAGE_AUTH, JSON.stringify(a));
+}
+
+function isUnlocked() {
+  return sessionStorage.getItem(STORAGE_SESSION) === "1";
+}
+function setUnlocked() {
+  sessionStorage.setItem(STORAGE_SESSION, "1");
+}
+function clearUnlocked() {
+  sessionStorage.removeItem(STORAGE_SESSION);
+}
+
+/* ============================
+   啟動流程
+   ============================ */
+function boot() {
+  if (!auth || !auth.endpoint || !auth.password) {
+    // 沒設定過 → 設定精靈
+    showWizard();
+    return;
+  }
+  if (isUnlocked()) {
+    // 本次 session 已解鎖 → 直接進主畫面
+    showApp();
+    return;
+  }
+  // 有設定但未解鎖 → 鎖定畫面
+  showLock();
+}
+
+function showWizard() {
+  document.getElementById("wizard").classList.remove("hidden");
+  document.getElementById("lockScreen").classList.add("hidden");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("submitBar").classList.add("hidden");
+
+  // 檢查 WebAuthn 支援
+  if (!isBioSupported()) {
+    document.getElementById("bioDesc").textContent = "你的裝置或瀏覽器不支援生物辨識,完成設定後將使用密碼解鎖。";
+    document.getElementById("bioBtn").disabled = true;
+    document.getElementById("bioBtn").textContent = "(不支援)";
+  }
+}
+
+function showLock() {
+  document.getElementById("wizard").classList.add("hidden");
+  document.getElementById("lockScreen").classList.remove("hidden");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("submitBar").classList.add("hidden");
+
+  // 沒註冊生物辨識 → 隱藏指紋按鈕
+  if (!auth.bioCredId || !isBioSupported()) {
+    document.getElementById("lockBioBtn").classList.add("hidden");
+    document.getElementById("lockHint").textContent = "輸入密碼解鎖";
+    showPasswordUnlock();
+  }
+}
+
+function showApp() {
+  document.getElementById("wizard").classList.add("hidden");
+  document.getElementById("lockScreen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("submitBar").classList.remove("hidden");
+  renderAll();
+  updateCardVisibility();
+}
+
+/* ============================
+   設定精靈
+   ============================ */
+async function testConnection() {
+  const url = document.getElementById("setupUrl").value.trim();
+  if (!url) { setStatus("setupUrlStatus", "請先輸入網址", "error"); return; }
+  if (!url.startsWith("https://script.google.com/")) {
+    setStatus("setupUrlStatus", "網址格式不對,應該以 https://script.google.com/ 開頭", "error");
+    return;
+  }
+  setStatus("setupUrlStatus", "<span class='spinner'></span>連線中...", "ok");
+  try {
+    // 不帶密碼,只測試網址通不通(會被擋,但能確認網址有效)
+    const res = await fetch(url + "?action=ping&password=__test__", { method: "GET" });
+    const data = await res.json();
+    // 我們預期得到 "密碼錯誤",這代表網址正確且有回應
+    if (data && (data.error === "AUTH_FAILED" || data.ok === true)) {
+      setupState.url = url;
+      setupState.urlOk = true;
+      document.getElementById("step-url").classList.add("done");
+      setStatus("setupUrlStatus", "✓ 網址正確,可以連到 Apps Script", "ok");
+      checkFinishReady();
+    } else {
+      setStatus("setupUrlStatus", "網址有回應但格式不對,請確認 Code.gs 程式碼有正確部署", "error");
+    }
+  } catch (err) {
+    setStatus("setupUrlStatus", "連線失敗:" + err.message + " — 請確認網址、且 Web App 已部署為「任何人可存取」", "error");
+  }
+}
+
+function setStatus(id, html, type) {
+  const el = document.getElementById(id);
+  el.classList.remove("hidden", "ok", "error");
+  el.classList.add(type);
+  el.innerHTML = html;
+}
+
+function isBioSupported() {
+  return window.PublicKeyCredential &&
+         typeof navigator.credentials !== "undefined" &&
+         typeof navigator.credentials.create === "function";
+}
+
+async function setupBiometric() {
+  if (!isBioSupported()) {
+    setStatus("setupBioStatus", "此裝置不支援生物辨識", "error");
+    return;
+  }
+  try {
+    const credId = await registerBiometric();
+    setupState.bioCredId = credId;
+    document.getElementById("step-bio").classList.add("done");
+    setStatus("setupBioStatus", "✓ 已註冊生物辨識", "ok");
+    checkFinishReady();
+  } catch (err) {
+    setStatus("setupBioStatus", "註冊失敗:" + err.message + " — 可以略過用密碼解鎖", "error");
+  }
+}
+
+function skipBiometric() {
+  setupState.bioCredId = null;
+  document.getElementById("step-bio").classList.add("done");
+  setStatus("setupBioStatus", "✓ 已略過,將使用密碼解鎖", "ok");
+  checkFinishReady();
+}
+
+function checkFinishReady() {
+  const pwd = document.getElementById("setupPwd").value;
+  const pwd2 = document.getElementById("setupPwd2").value;
+  const passwordOk = pwd && pwd === pwd2 && pwd.length >= 4;
+  if (passwordOk) document.getElementById("step-password").classList.add("done");
+  else document.getElementById("step-password").classList.remove("done");
+
+  const ready = setupState.urlOk && passwordOk;
+  document.getElementById("finishBtn").disabled = !ready;
+}
+
+function finishSetup() {
+  const pwd = document.getElementById("setupPwd").value;
+  const pwd2 = document.getElementById("setupPwd2").value;
+  if (!setupState.urlOk) { showToast("請先測試 Apps Script 網址", "error"); return; }
+  if (!pwd || pwd !== pwd2) { showToast("密碼不一致", "error"); return; }
+  if (pwd.length < 4) { showToast("密碼至少 4 個字", "error"); return; }
+
+  saveAuth({
+    endpoint: setupState.url,
+    password: pwd,
+    bioCredId: setupState.bioCredId
+  });
+  setUnlocked(); // 設定完直接解鎖
+  showApp();
+  showToast("設定完成,可以開始記帳了!", "success");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  ["setupPwd", "setupPwd2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", checkFinishReady);
+  });
+});
+
+/* ============================
+   生物辨識(WebAuthn)
+   ============================ */
+async function registerBiometric() {
+  const challenge = crypto.getRandomValues(new Uint8Array(32));
+  const userId = crypto.getRandomValues(new Uint8Array(16));
+  const opts = {
+    publicKey: {
+      challenge,
+      rp: { name: "速記帳", id: window.location.hostname },
+      user: {
+        id: userId,
+        name: "ledger-user",
+        displayName: "速記帳使用者"
+      },
+      pubKeyCredParams: [
+        { type: "public-key", alg: -7 },   // ES256
+        { type: "public-key", alg: -257 }  // RS256
+      ],
+      authenticatorSelection: {
+        authenticatorAttachment: "platform",
+        userVerification: "required",
+        residentKey: "preferred"
+      },
+      timeout: 60000,
+      attestation: "none"
+    }
+  };
+  const cred = await navigator.credentials.create(opts);
+  return arrayBufferToBase64(cred.rawId);
+}
+
+async function verifyBiometric() {
+  if (!auth || !auth.bioCredId) throw new Error("未註冊生物辨識");
+  const challenge = crypto.getRandomValues(new Uint8Array(32));
+  const credIdBytes = base64ToArrayBuffer(auth.bioCredId);
+  const opts = {
+    publicKey: {
+      challenge,
+      allowCredentials: [{
+        type: "public-key",
+        id: credIdBytes,
+        transports: ["internal"]
+      }],
+      userVerification: "required",
+      timeout: 60000
+    }
+  };
+  await navigator.credentials.get(opts);
+  return true;
+}
+
+function arrayBufferToBase64(buf) {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+function base64ToArrayBuffer(b64) {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes.buffer;
+}
+
+/* ============================
+   解鎖
+   ============================ */
+async function unlockWithBio() {
+  try {
+    await verifyBiometric();
+    setUnlocked();
+    showApp();
+  } catch (err) {
+    showToast("生物辨識失敗:" + err.message, "error");
+  }
+}
+
+function showPasswordUnlock() {
+  document.getElementById("lockPwdSection").classList.remove("hidden");
+  document.getElementById("lockPwd").focus();
+}
+
+function unlockWithPassword() {
+  const pwd = document.getElementById("lockPwd").value;
+  if (pwd === auth.password) {
+    setUnlocked();
+    document.getElementById("lockPwd").value = "";
+    showApp();
+  } else {
+    showToast("密碼錯誤", "error");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lp = document.getElementById("lockPwd");
+  if (lp) lp.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") unlockWithPassword();
+  });
+});
+
+/* ============================
+   主介面渲染
+   ============================ */
+function renderAll() {
+  for (const field of ["account", "category", "payment", "card", "note"]) {
+    renderField(field);
+  }
+}
+
+function renderField(field) {
+  const container = document.getElementById("pills-" + field);
+  const cfg = state[field];
+  document.getElementById("cols-" + field).textContent = cfg.cols;
+
+  container.innerHTML = "";
+  container.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
+
+  cfg.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "pill";
+    btn.textContent = opt;
+    btn.dataset.field = field;
+    btn.dataset.index = idx;
+    btn.draggable = true;
+    if (selected[field] === opt) btn.classList.add("selected");
+    btn.addEventListener("click", () => onPillClick(field, idx));
+    btn.addEventListener("dragstart", onDragStart);
+    btn.addEventListener("dragover", onDragOver);
+    btn.addEventListener("drop", onDrop);
+    btn.addEventListener("dragend", onDragEnd);
+    addTouchDrag(btn, field);
+    container.appendChild(btn);
+  });
+
+  if (field === "note" || field === "payment" || field === "category") {
+    const otherBtn = document.createElement("button");
+    otherBtn.className = "pill other no-delete";
+    const customKey = field + "Custom";
+    if (selected[field] === "__other__") {
+      otherBtn.classList.add("selected");
+      otherBtn.innerHTML = `其他: <span class="custom-text">&nbsp;${escapeHtml(selected[customKey] || "")}</span>`;
+    } else {
+      otherBtn.textContent = "其他…";
+    }
+    otherBtn.addEventListener("click", () => openTextModal(field));
+    container.appendChild(otherBtn);
+  }
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "add-pill";
+  addBtn.textContent = "+ 新增";
+  addBtn.addEventListener("click", () => openAddModal(field));
+  container.appendChild(addBtn);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function onPillClick(field, idx) {
+  if (isEditing) {
+    if (confirm(`刪除「${state[field].options[idx]}」?`)) {
+      state[field].options.splice(idx, 1);
+      saveState();
+      renderField(field);
+    }
+    return;
+  }
+  const opt = state[field].options[idx];
+  selected[field] = (selected[field] === opt) ? null : opt;
+  renderField(field);
+  updateCardVisibility();
+}
+
+function updateCardVisibility() {
+  // 不展開卡別的支付方式:轉帳、現金、自填的「其他」
+  const NO_CARD_PAYMENTS = ["💸轉帳", "💰現金"];
+  const payment = selected.payment;
+  const needCard = payment
+    && payment !== "__other__"
+    && !NO_CARD_PAYMENTS.includes(payment);
+
+  const cardCard = document.getElementById("cardCard");
+  if (needCard) {
+    cardCard.classList.remove("card-collapsed");
+  } else {
+    cardCard.classList.add("card-collapsed");
+    selected.card = null;
+    renderField("card");
+  }
+}
+
+/* ============================
+   Modal: 自由輸入
+   ============================ */
+function openTextModal(field) {
+  if (isEditing) return;
+  modalContext = { type: "other", field };
+  const titleMap = { note: "其他備註", payment: "其他支付方式", category: "其他類別" };
+  document.getElementById("modalTitle").textContent = titleMap[field] || "輸入";
+  document.getElementById("modalDesc").textContent = "輸入後此次紀錄會用這個值";
+  document.getElementById("modalInput").value = selected[field + "Custom"] || "";
+  document.getElementById("textModal").classList.add("show");
+  setTimeout(() => document.getElementById("modalInput").focus(), 50);
+}
+
+function openAddModal(field) {
+  modalContext = { type: "add", field };
+  document.getElementById("modalTitle").textContent = "新增選項";
+  document.getElementById("modalDesc").textContent = "可以輸入 emoji + 文字,例如「🍜拉麵」";
+  document.getElementById("modalInput").value = "";
+  document.getElementById("textModal").classList.add("show");
+  setTimeout(() => document.getElementById("modalInput").focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById("textModal").classList.remove("show");
+  modalContext = null;
+}
+
+function confirmModal() {
+  const val = document.getElementById("modalInput").value.trim();
+  if (!val) { closeModal(); return; }
+
+  if (modalContext.type === "other") {
+    selected[modalContext.field + "Custom"] = val;
+    selected[modalContext.field] = "__other__";
+    renderField(modalContext.field);
+    updateCardVisibility();
+  } else if (modalContext.type === "add") {
+    state[modalContext.field].options.push(val);
+    saveState();
+    renderField(modalContext.field);
+  }
+  closeModal();
+}
+
+/* ============================
+   編輯模式
+   ============================ */
+function toggleEdit() {
+  isEditing = !isEditing;
+  document.getElementById("app").classList.toggle("editing", isEditing);
+  document.getElementById("editBtn").classList.toggle("active", isEditing);
+  if (!isEditing) saveState();
+}
+
+function adjustCols(field, delta) {
+  const cur = state[field].cols;
+  const next = Math.max(1, Math.min(5, cur + delta));
+  state[field].cols = next;
+  saveState();
+  renderField(field);
+}
+
+/* ============================
+   拖曳排序
+   ============================ */
+let dragSrc = null;
+function onDragStart(e) {
+  if (!isEditing) { e.preventDefault(); return; }
+  dragSrc = e.currentTarget;
+  e.currentTarget.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+}
+function onDragOver(e) {
+  if (!isEditing || !dragSrc) return;
+  if (dragSrc.dataset.field !== e.currentTarget.dataset.field) return;
+  e.preventDefault();
+  e.currentTarget.classList.add("drag-over");
+}
+function onDrop(e) {
+  if (!isEditing || !dragSrc) return;
+  if (dragSrc.dataset.field !== e.currentTarget.dataset.field) return;
+  e.preventDefault();
+  const field = dragSrc.dataset.field;
+  const fromIdx = parseInt(dragSrc.dataset.index);
+  const toIdx = parseInt(e.currentTarget.dataset.index);
+  const arr = state[field].options;
+  const [moved] = arr.splice(fromIdx, 1);
+  arr.splice(toIdx, 0, moved);
+  saveState();
+  renderField(field);
+}
+function onDragEnd(e) {
+  e.currentTarget.classList.remove("dragging");
+  document.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+  dragSrc = null;
+}
+
+function addTouchDrag(el, field) {
+  let pressTimer = null;
+  let dragging = false;
+  let ghost = null;
+  let startX, startY;
+  let currentTarget = null;
+
+  el.addEventListener("touchstart", (e) => {
+    if (!isEditing) return;
+    const t = e.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    pressTimer = setTimeout(() => {
+      dragging = true;
+      navigator.vibrate && navigator.vibrate(30);
+      const rect = el.getBoundingClientRect();
+      ghost = el.cloneNode(true);
+      ghost.style.position = "fixed";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      ghost.style.width = rect.width + "px";
+      ghost.style.zIndex = "300";
+      ghost.style.opacity = "0.85";
+      ghost.style.pointerEvents = "none";
+      ghost.style.transform = "scale(1.05)";
+      ghost.style.transition = "none";
+      document.body.appendChild(ghost);
+      el.style.opacity = "0.3";
+    }, 350);
+  }, { passive: true });
+
+  el.addEventListener("touchmove", (e) => {
+    if (!dragging) {
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - startX) > 8 || Math.abs(t.clientY - startY) > 8) {
+        clearTimeout(pressTimer);
+      }
+      return;
+    }
+    e.preventDefault();
+    const t = e.touches[0];
+    const rect = el.getBoundingClientRect();
+    ghost.style.left = (t.clientX - rect.width / 2) + "px";
+    ghost.style.top = (t.clientY - rect.height / 2) + "px";
+    ghost.style.display = "none";
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    ghost.style.display = "";
+    document.querySelectorAll(".drag-over").forEach(x => x.classList.remove("drag-over"));
+    if (under && under.classList.contains("pill") && under.dataset.field === field && under !== el) {
+      under.classList.add("drag-over");
+      currentTarget = under;
+    } else {
+      currentTarget = null;
+    }
+  }, { passive: false });
+
+  el.addEventListener("touchend", () => {
+    clearTimeout(pressTimer);
+    if (dragging) {
+      el.style.opacity = "";
+      ghost && ghost.remove();
+      ghost = null;
+      document.querySelectorAll(".drag-over").forEach(x => x.classList.remove("drag-over"));
+      if (currentTarget) {
+        const fromIdx = parseInt(el.dataset.index);
+        const toIdx = parseInt(currentTarget.dataset.index);
+        const arr = state[field].options;
+        const [moved] = arr.splice(fromIdx, 1);
+        arr.splice(toIdx, 0, moved);
+        saveState();
+        renderField(field);
+      }
+      dragging = false;
+      currentTarget = null;
+    }
+  });
+
+  el.addEventListener("touchcancel", () => {
+    clearTimeout(pressTimer);
+    if (dragging) {
+      el.style.opacity = "";
+      ghost && ghost.remove();
+      ghost = null;
+      dragging = false;
+    }
+  });
+}
+
+/* ============================
+   送出資料 → Apps Script
+   ============================ */
+function submit() {
+  const amount = document.getElementById("amountInput").value.trim();
+  if (!amount) { showToast("請填寫金額", "error"); document.getElementById("amountInput").focus(); return; }
+  if (!selected.account) { showToast("請選擇帳目", "error"); return; }
+  if (!selected.category) { showToast("請選擇類別", "error"); return; }
+  if (!selected.payment) { showToast("請選擇支付方式", "error"); return; }
+  if (selected.category === "__other__" && !selected.categoryCustom) { showToast("「其他類別」請填內容", "error"); return; }
+  if (selected.payment === "__other__" && !selected.paymentCustom) { showToast("「其他支付方式」請填內容", "error"); return; }
+  if (selected.note === "__other__" && !selected.noteCustom) { showToast("「其他備註」請填內容", "error"); return; }
+
+  const data = collectData();
+  const body = document.getElementById("previewBody");
+  body.innerHTML = "";
+  const labels = {
+    date: "補登日期", amount: "金額", account: "帳目",
+    category: "類別", payment: "支付方式", card: "卡別", note: "備註"
+  };
+  for (const k of ["date", "amount", "account", "category", "payment", "card", "note"]) {
+    const row = document.createElement("div");
+    row.className = "preview-row";
+    const v = data[k];
+    row.innerHTML = `<span class="k">${labels[k]}</span><span class="v ${!v ? 'empty' : ''}">${v ? escapeHtml(v) : "(空白)"}</span>`;
+    body.appendChild(row);
+  }
+  document.getElementById("previewModal").classList.add("show");
+}
+
+function collectData() {
+  const resolveOther = (field) => {
+    if (selected[field] === "__other__") return selected[field + "Custom"] || "";
+    return selected[field] || "";
+  };
+  return {
+    date: document.getElementById("dateInput").value || "",
+    amount: document.getElementById("amountInput").value || "",
+    account: selected.account || "",
+    category: resolveOther("category"),
+    payment: resolveOther("payment"),
+    card: selected.card || "",
+    note: resolveOther("note")
+  };
+}
+
+function closePreview() {
+  document.getElementById("previewModal").classList.remove("show");
+}
+
+async function finalSubmit() {
+  const data = collectData();
+  const btn = document.getElementById("finalSubmitBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>送出中...';
+
+  try {
+    // 用 GET (URLSearchParams) 避免 CORS preflight
+    const params = new URLSearchParams();
+    params.append("password", auth.password);
+    params.append("action", "append");
+    params.append("data", JSON.stringify(data));
+    // 改用 POST 但用 text/plain 避免 preflight
+    const res = await fetch(auth.endpoint, {
+      method: "POST",
+      body: JSON.stringify({
+        password: auth.password,
+        action: "append",
+        data: data
+      }),
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    });
+    const result = await res.json();
+
+    if (result.ok) {
+      closePreview();
+      showToast("✓ 已寫入第 " + result.rowNumber + " 列", "success");
+      resetForm();
+    } else {
+      showToast("送出失敗: " + (result.message || result.error), "error");
+    }
+  } catch (err) {
+    showToast("網路錯誤: " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "確定送出";
+  }
+}
+
+function resetForm() {
+  document.getElementById("amountInput").value = "";
+  document.getElementById("dateInput").value = "";
+  selected = blankSelection();
+  renderAll();
+  updateCardVisibility();
+}
+
+function showToast(msg, type) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.remove("success", "error");
+  if (type) el.classList.add(type);
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2500);
+}
+
+document.getElementById("modalInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") confirmModal();
+  if (e.key === "Escape") closeModal();
+});
+
+/* ============================
+   設定頁
+   ============================ */
+function openSettings() {
+  document.getElementById("settingsModal").classList.add("show");
+}
+function closeSettings() {
+  document.getElementById("settingsModal").classList.remove("show");
+}
+
+let editSettingType = null;
+function showUrlEdit() {
+  editSettingType = "url";
+  document.getElementById("editSettingTitle").textContent = "Apps Script 網址";
+  document.getElementById("editSettingDesc").textContent = "修改後請確認新網址有效。";
+  document.getElementById("editSettingInput").value = auth.endpoint;
+  document.getElementById("editSettingInput").type = "url";
+  document.getElementById("editSettingModal").classList.add("show");
+}
+
+async function showPasswordView() {
+  // 看密碼前要過驗證
+  if (auth.bioCredId && isBioSupported()) {
+    try {
+      await verifyBiometric();
+    } catch (err) {
+      showToast("驗證失敗", "error");
+      return;
+    }
+  } else {
+    const pwd = prompt("請輸入目前密碼以查看");
+    if (pwd !== auth.password) { showToast("密碼錯誤", "error"); return; }
+  }
+  editSettingType = "password";
+  document.getElementById("editSettingTitle").textContent = "密碼";
+  document.getElementById("editSettingDesc").textContent = "目前密碼如下,可直接修改。記得 Apps Script 的 Code.gs 也要同步更新。";
+  document.getElementById("editSettingInput").value = auth.password;
+  document.getElementById("editSettingInput").type = "text";
+  document.getElementById("editSettingModal").classList.add("show");
+}
+
+function closeEditSetting() {
+  document.getElementById("editSettingModal").classList.remove("show");
+  editSettingType = null;
+}
+
+function saveEditSetting() {
+  const val = document.getElementById("editSettingInput").value.trim();
+  if (!val) { showToast("不能空白", "error"); return; }
+  if (editSettingType === "url") {
+    auth.endpoint = val;
+  } else if (editSettingType === "password") {
+    auth.password = val;
+  }
+  saveAuth(auth);
+  closeEditSetting();
+  showToast("已儲存", "success");
+}
+
+async function reregisterBio() {
+  if (!isBioSupported()) {
+    showToast("此裝置不支援生物辨識", "error");
+    return;
+  }
+  try {
+    const credId = await registerBiometric();
+    auth.bioCredId = credId;
+    saveAuth(auth);
+    showToast("已重新註冊生物辨識", "success");
+  } catch (err) {
+    showToast("註冊失敗: " + err.message, "error");
+  }
+}
+
+/* ============================
+   登出(兩段確認)
+   ============================ */
+function confirmLogout1() {
+  closeSettings();
+  document.getElementById("logoutConfirmModal").classList.add("show");
+}
+function closeLogoutConfirm() {
+  document.getElementById("logoutConfirmModal").classList.remove("show");
+}
+function doLogout() {
+  closeLogoutConfirm();
+  clearUnlocked();
+  showLock();
+}
+
+/* ============================
+   啟動
+   ============================ */
+boot();
+</script>
+
+</body>
+</html>
