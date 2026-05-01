@@ -263,9 +263,13 @@
     z-index: 10;
   }
   .submit-bar > * { pointer-events: auto; }
-  .submit-btn {
+  .submit-bar-inner {
     width: 100%;
     max-width: 452px;
+    display: flex;
+    gap: 8px;
+  }
+  .submit-btn {
     background: var(--ink);
     color: var(--pill-active-ink);
     border: none;
@@ -277,6 +281,14 @@
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(40, 35, 28, 0.15);
     transition: transform 0.1s;
+    flex: 2;
+  }
+  .submit-btn.preview-btn {
+    background: var(--card);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    box-shadow: 0 4px 12px rgba(40, 35, 28, 0.06);
+    flex: 1;
   }
   .submit-btn:active { transform: scale(0.98); }
   .submit-btn:disabled {
@@ -883,7 +895,10 @@
 </div>
 
 <div class="submit-bar hidden" id="submitBar">
-  <button class="submit-btn" id="submitBtn" onclick="submit()">預覽 & 送出</button>
+  <div class="submit-bar-inner">
+    <button class="submit-btn preview-btn" onclick="openPreview()">預覽</button>
+    <button class="submit-btn" id="submitBtn" onclick="quickSubmit()">直接送出</button>
+  </div>
 </div>
 
 <!-- Modal: 自由輸入 -->
@@ -928,6 +943,21 @@
       <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="reregisterBio()">
         👆 重新註冊生物辨識
       </button>
+
+      <div style="height:1px; background:var(--line); margin:4px 0;"></div>
+
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="openExportModal()">
+        📤 匯出設定(同步到其他裝置)
+      </button>
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="openImportModal()">
+        📥 匯入設定
+      </button>
+      <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="confirmReset1()">
+        🔄 還原原廠選項
+      </button>
+
+      <div style="height:1px; background:var(--line); margin:4px 0;"></div>
+
       <button class="btn-cancel" style="text-align:left; padding:14px;" onclick="confirmLogout1()">
         🚪 登出
       </button>
@@ -935,6 +965,63 @@
 
     <div class="modal-actions">
       <button class="btn-confirm" onclick="closeSettings()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 匯出設定 -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal" style="max-width: 420px;">
+    <h3>匯出設定</h3>
+    <p>把這台裝置目前的選項配置匯出,在其他裝置匯入即可同步。</p>
+    <textarea id="exportText" readonly style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:11px; font-family: 'Inter', monospace; outline:none; resize:vertical; line-height:1.5;"></textarea>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-cancel" style="flex:1; padding:12px; border-radius:10px; font-size:14px; font-family:inherit; border:none; cursor:pointer;" onclick="copyExportText()">📋 複製</button>
+      <button class="btn-cancel" style="flex:1; padding:12px; border-radius:10px; font-size:14px; font-family:inherit; border:none; cursor:pointer;" onclick="downloadExportFile()">💾 下載檔案</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-confirm" onclick="closeExportModal()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 匯入設定 -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width: 420px;">
+    <h3>匯入設定</h3>
+    <p>貼上設定文字,或選擇 .json 檔。匯入後會<strong>覆蓋</strong>目前的選項配置。</p>
+    <textarea id="importText" placeholder="貼上從匯出取得的文字..." style="width:100%; min-height:140px; border:1.5px solid var(--line); border-radius:10px; padding:12px; font-size:11px; font-family: 'Inter', monospace; outline:none; resize:vertical; line-height:1.5;"></textarea>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn-cancel" style="flex:1; padding:12px; border-radius:10px; font-size:14px; font-family:inherit; border:none; cursor:pointer;" onclick="document.getElementById('importFile').click()">📁 選擇檔案</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="loadImportFile(event)">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeImportModal()">取消</button>
+      <button class="btn-confirm" onclick="doImport()">匯入</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 還原原廠確認 1 -->
+<div class="modal-overlay" id="resetConfirm1Modal">
+  <div class="modal">
+    <h3>還原原廠選項?</h3>
+    <p>這會把所有選項(類別、支付方式、備註等)還原成最初的預設值。<br><br>⚠️ 你新增的、編輯過的選項都會消失。建議還原前先匯出備份。</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeResetConfirm1()">取消</button>
+      <button class="btn-danger" onclick="confirmReset2()">繼續</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 還原原廠確認 2 -->
+<div class="modal-overlay" id="resetConfirm2Modal">
+  <div class="modal">
+    <h3>真的要還原嗎?</h3>
+    <p>再次確認:還原後<strong>無法復原</strong>。<br><br>(已記入試算表的記帳資料不會受影響,只重置這台裝置的按鈕配置)</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeResetConfirm2()">取消</button>
+      <button class="btn-danger" onclick="doReset()">確定還原</button>
     </div>
   </div>
 </div>
@@ -1006,12 +1093,12 @@ const DEFAULT_DATA = {
   category: {
     cols: 3,
     options: [
-      "1🍖三餐", "2🍫零食", "3🍻聚餐",
-      "4👫生活交友", "5💇‍♀️理髮置裝", "6📱3C娛樂",
-      "7⚽運動休閒", "8🛵交通油錢", "9🔷其他",
-      "🌱收入", "⛏️投存", "A🛍️墊支",
-      "B💼專案1", "B💼專案2", "B💼專案3",
-      "B💼專案4", "B💼專案5", "C💵保險稅務"
+      "1🍖三餐", "2🍖零食", "3🍖聚餐",
+      "4🏡生活交友", "5🏡理髮置裝", "6📱3Ｃ娛樂",
+      "7🏓運動休閒", "8🛵交通油錢", "9🔷其他",
+      "A⚖墊支", "B💼專案1", "B💼專案2",
+      "B💼專案3", "B💼專案4", "B💼專案5",
+      "C💵保險稅務", "📥收入", "📥投存"
     ]
   },
   payment: {
@@ -1690,15 +1777,27 @@ function addTouchDrag(el, field) {
 /* ============================
    送出資料 → Apps Script
    ============================ */
-function submit() {
+function validateForm() {
   const amount = document.getElementById("amountInput").value.trim();
-  if (!amount) { showToast("請填寫金額", "error"); document.getElementById("amountInput").focus(); return; }
-  if (!selected.account) { showToast("請選擇帳目", "error"); return; }
-  if (!selected.category) { showToast("請選擇類別", "error"); return; }
-  if (!selected.payment) { showToast("請選擇支付方式", "error"); return; }
-  if (selected.category === "__other__" && !selected.categoryCustom) { showToast("「其他類別」請填內容", "error"); return; }
-  if (selected.payment === "__other__" && !selected.paymentCustom) { showToast("「其他支付方式」請填內容", "error"); return; }
-  if (selected.note === "__other__" && !selected.noteCustom) { showToast("「其他備註」請填內容", "error"); return; }
+  if (!amount) { showToast("請填寫金額", "error"); document.getElementById("amountInput").focus(); return false; }
+  if (!selected.account) { showToast("請選擇帳目", "error"); return false; }
+  if (!selected.category) { showToast("請選擇類別", "error"); return false; }
+  if (!selected.payment) { showToast("請選擇支付方式", "error"); return false; }
+  if (selected.category === "__other__" && !selected.categoryCustom) { showToast("「其他類別」請填內容", "error"); return false; }
+  if (selected.payment === "__other__" && !selected.paymentCustom) { showToast("「其他支付方式」請填內容", "error"); return false; }
+  if (selected.note === "__other__" && !selected.noteCustom) { showToast("「其他備註」請填內容", "error"); return false; }
+  return true;
+}
+
+function quickSubmit() {
+  // 直接送出,不顯示預覽
+  if (!validateForm()) return;
+  doSubmit();
+}
+
+function openPreview() {
+  // 開啟預覽視窗,讓使用者確認後再送
+  if (!validateForm()) return;
 
   const data = collectData();
   const body = document.getElementById("previewBody");
@@ -1737,7 +1836,7 @@ function closePreview() {
   document.getElementById("previewModal").classList.remove("show");
 }
 
-function finalSubmit() {
+function doSubmit() {
   // === 樂觀回應:立刻關閉 modal、重置表單,讓使用者馬上記下一筆 ===
   const data = collectData();
   closePreview();
@@ -1757,6 +1856,11 @@ function finalSubmit() {
 
   // 啟動背景送出
   processQueue();
+}
+
+function finalSubmit() {
+  // 預覽視窗的「確定送出」按鈕 — 行為跟 doSubmit 一樣
+  doSubmit();
 }
 
 /* ============================
@@ -2103,6 +2207,144 @@ async function reregisterBio() {
   } catch (err) {
     showToast("註冊失敗: " + err.message, "error");
   }
+}
+
+/* ============================
+   匯出 / 匯入 / 還原原廠
+   ============================ */
+function buildExportPayload() {
+  return {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    config: state
+  };
+}
+
+function openExportModal() {
+  closeSettings();
+  const payload = buildExportPayload();
+  const text = JSON.stringify(payload, null, 2);
+  document.getElementById("exportText").value = text;
+  document.getElementById("exportModal").classList.add("show");
+}
+function closeExportModal() {
+  document.getElementById("exportModal").classList.remove("show");
+}
+
+async function copyExportText() {
+  const text = document.getElementById("exportText").value;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // fallback
+      const ta = document.getElementById("exportText");
+      ta.select();
+      document.execCommand("copy");
+    }
+    showToast("✓ 已複製到剪貼簿", "success");
+  } catch (err) {
+    showToast("複製失敗,請手動全選複製", "error");
+  }
+}
+
+function downloadExportFile() {
+  const text = document.getElementById("exportText").value;
+  const blob = new Blob([text], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const dt = new Date();
+  const fname = `quick-ledger-config-${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,"0")}${String(dt.getDate()).padStart(2,"0")}.json`;
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("✓ 已下載 " + fname, "success");
+}
+
+function openImportModal() {
+  closeSettings();
+  document.getElementById("importText").value = "";
+  document.getElementById("importFile").value = "";
+  document.getElementById("importModal").classList.add("show");
+}
+function closeImportModal() {
+  document.getElementById("importModal").classList.remove("show");
+}
+
+function loadImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById("importText").value = e.target.result;
+  };
+  reader.onerror = () => {
+    showToast("讀檔失敗", "error");
+  };
+  reader.readAsText(file);
+}
+
+function doImport() {
+  const text = document.getElementById("importText").value.trim();
+  if (!text) { showToast("請先貼上文字或選擇檔案", "error"); return; }
+
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch (err) {
+    showToast("格式錯誤,不是有效的 JSON", "error");
+    return;
+  }
+
+  if (!payload || !payload.config) {
+    showToast("格式錯誤,缺少 config 欄位", "error");
+    return;
+  }
+
+  // 驗證每個欄位
+  const cfg = payload.config;
+  const requiredFields = ["account", "category", "payment", "card", "note"];
+  for (const f of requiredFields) {
+    if (!cfg[f] || !Array.isArray(cfg[f].options) || typeof cfg[f].cols !== "number") {
+      showToast(`格式錯誤,${f} 欄位無效`, "error");
+      return;
+    }
+  }
+
+  // 通過驗證,寫入
+  state = cfg;
+  saveState();
+  renderAll();
+  updateCardVisibility();
+  closeImportModal();
+  showToast("✓ 已匯入設定", "success");
+}
+
+function confirmReset1() {
+  closeSettings();
+  document.getElementById("resetConfirm1Modal").classList.add("show");
+}
+function closeResetConfirm1() {
+  document.getElementById("resetConfirm1Modal").classList.remove("show");
+}
+function confirmReset2() {
+  closeResetConfirm1();
+  document.getElementById("resetConfirm2Modal").classList.add("show");
+}
+function closeResetConfirm2() {
+  document.getElementById("resetConfirm2Modal").classList.remove("show");
+}
+function doReset() {
+  state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  saveState();
+  selected = blankSelection();
+  renderAll();
+  updateCardVisibility();
+  closeResetConfirm2();
+  showToast("✓ 已還原原廠選項", "success");
 }
 
 /* ============================
