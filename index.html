@@ -428,6 +428,140 @@
     border: 1.5px dashed #d4b76a;
   }
 
+  /* ===== 待送出徽章 ===== */
+  .icon-btn .badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    min-width: 18px; height: 18px;
+    padding: 0 4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Inter", inherit;
+    border: 2px solid var(--bg);
+  }
+  .icon-btn { position: relative; }
+  .icon-btn.has-pending {
+    color: var(--danger);
+    border-color: #f0c0b3;
+  }
+
+  /* ===== 失敗紀錄列表 ===== */
+  .pending-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin: 12px 0;
+  }
+  .pending-item {
+    background: #fef5f2;
+    border: 1px solid #f0c0b3;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+  .pending-item .meta {
+    color: var(--ink-soft);
+    font-size: 11px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .pending-item .data {
+    line-height: 1.7;
+  }
+  .pending-item .data .row {
+    display: flex;
+    gap: 6px;
+  }
+  .pending-item .data .k {
+    color: var(--ink-soft);
+    min-width: 56px;
+    font-size: 12px;
+  }
+  .pending-item .data .v {
+    flex: 1;
+    word-break: break-all;
+    font-weight: 500;
+  }
+  .pending-item .actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .pending-item .actions button {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .pending-item .actions .retry {
+    background: var(--ink);
+    color: white;
+  }
+  .pending-item .actions .edit {
+    background: var(--accent);
+    color: white;
+  }
+  .pending-item .actions .discard {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+  .pending-empty {
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 30px 0;
+    font-size: 14px;
+  }
+
+  /* 離線狀態列 */
+  .offline-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #c8845b;
+    color: white;
+    padding: 6px 14px;
+    text-align: center;
+    font-size: 12px;
+    z-index: 50;
+    transform: translateY(-100%);
+    transition: transform 0.3s;
+  }
+  .offline-bar.show {
+    transform: translateY(0);
+  }
+  .offline-bar.show + .app {
+    padding-top: 36px;
+  }
+
+  /* 送出中的小指示器(右下角) */
+  .syncing-indicator {
+    position: fixed;
+    bottom: 90px;
+    right: 14px;
+    background: var(--ink);
+    color: white;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12px;
+    z-index: 40;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .syncing-indicator.show { display: flex; }
+
   /* ===== Setup Wizard ===== */
   .wizard {
     max-width: 460px;
@@ -653,6 +787,10 @@
 
   <div class="header">
     <h1><span class="dot"></span>速記帳</h1>
+    <button class="icon-btn hidden" id="pendingBtn" onclick="openPendingModal()" title="待送出資料">
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.2-8.55"/><path d="M21 4v5h-5"/></svg>
+      <span class="badge" id="pendingBadge">0</span>
+    </button>
     <button class="icon-btn" id="editBtn" onclick="toggleEdit()" title="編輯選項">
       <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
     </button>
@@ -826,6 +964,25 @@
   </div>
 </div>
 
+<div class="offline-bar" id="offlineBar">📵 離線中 — 你的紀錄會先存起來,連上網路自動補送</div>
+
+<div class="syncing-indicator" id="syncingIndicator">
+  <span class="spinner"></span><span id="syncingText">送出中...</span>
+</div>
+
+<!-- Modal: 待送出 / 失敗紀錄列表 -->
+<div class="modal-overlay" id="pendingModal">
+  <div class="modal" style="max-width: 420px;">
+    <h3>待送出資料</h3>
+    <p>送出失敗或離線時暫存的資料,你可以重試或編輯後重送。</p>
+    <div class="pending-list" id="pendingList"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePendingModal()">關閉</button>
+      <button class="btn-confirm" id="retryAllBtn" onclick="retryAll()">全部重試</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -835,6 +992,11 @@
 const STORAGE_CONFIG = "ql.config.v1";
 const STORAGE_AUTH = "ql.auth.v1";       // {endpoint, password, bioCredId}
 const STORAGE_SESSION = "ql.session.v1"; // sessionStorage: 已解鎖標記
+const STORAGE_PENDING = "ql.pending.v1"; // 未送出 / 失敗的紀錄佇列
+
+// 重試設定
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 2000; // ms
 
 const DEFAULT_DATA = {
   account: {
@@ -849,7 +1011,7 @@ const DEFAULT_DATA = {
       "7⚽運動休閒", "8🛵交通油錢", "9🔷其他",
       "🌱收入", "⛏️投存", "A🛍️墊支",
       "B💼專案1", "B💼專案2", "B💼專案3",
-      "B💼專案4", "B💼專案5", "C💊保險稅務"
+      "B💼專案4", "B💼專案5", "C💵保險稅務"
     ]
   },
   payment: {
@@ -932,6 +1094,60 @@ function clearUnlocked() {
 }
 
 /* ============================
+   Pending Queue(離線/失敗暫存)
+   ============================ */
+function loadPending() {
+  try {
+    const saved = localStorage.getItem(STORAGE_PENDING);
+    if (saved) return JSON.parse(saved);
+  } catch (e) {}
+  return [];
+}
+function savePending(arr) {
+  localStorage.setItem(STORAGE_PENDING, JSON.stringify(arr));
+}
+function addPending(item) {
+  const arr = loadPending();
+  arr.push(item);
+  savePending(arr);
+  updatePendingBadge();
+}
+function removePending(id) {
+  const arr = loadPending().filter(x => x.id !== id);
+  savePending(arr);
+  updatePendingBadge();
+}
+function updatePending(id, patch) {
+  const arr = loadPending();
+  const idx = arr.findIndex(x => x.id === id);
+  if (idx >= 0) {
+    arr[idx] = { ...arr[idx], ...patch };
+    savePending(arr);
+  }
+}
+function getPending(id) {
+  return loadPending().find(x => x.id === id);
+}
+
+function updatePendingBadge() {
+  const arr = loadPending();
+  const btn = document.getElementById("pendingBtn");
+  const badge = document.getElementById("pendingBadge");
+  if (arr.length > 0) {
+    btn.classList.remove("hidden");
+    btn.classList.add("has-pending");
+    badge.textContent = arr.length;
+  } else {
+    btn.classList.add("hidden");
+    btn.classList.remove("has-pending");
+  }
+}
+
+function genId() {
+  return "p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+}
+
+/* ============================
    啟動流程
    ============================ */
 function boot() {
@@ -984,6 +1200,10 @@ function showApp() {
   document.getElementById("submitBar").classList.remove("hidden");
   renderAll();
   updateCardVisibility();
+  updatePendingBadge();
+  setupOfflineDetection();
+  // 進主畫面就試著補送之前失敗的(若是 sending 狀態)
+  processQueue();
 }
 
 /* ============================
@@ -1517,43 +1737,276 @@ function closePreview() {
   document.getElementById("previewModal").classList.remove("show");
 }
 
-async function finalSubmit() {
+function finalSubmit() {
+  // === 樂觀回應:立刻關閉 modal、重置表單,讓使用者馬上記下一筆 ===
   const data = collectData();
-  const btn = document.getElementById("finalSubmitBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>送出中...';
+  closePreview();
+  showToast("✓ 已收到,背景送出中", "success");
+  resetForm();
+
+  // 把這筆加入佇列(即使送出成功,送出前會在佇列裡 1-3 秒)
+  const item = {
+    id: genId(),
+    data: data,
+    createdAt: Date.now(),
+    status: "sending",  // sending | failed | offline
+    attempts: 0,
+    lastError: null
+  };
+  addPending(item);
+
+  // 啟動背景送出
+  processQueue();
+}
+
+/* ============================
+   背景送出佇列
+   ============================ */
+let processingQueue = false;
+
+async function processQueue() {
+  if (processingQueue) return;
+  processingQueue = true;
 
   try {
-    // 用 GET (URLSearchParams) 避免 CORS preflight
-    const params = new URLSearchParams();
-    params.append("password", auth.password);
-    params.append("action", "append");
-    params.append("data", JSON.stringify(data));
-    // 改用 POST 但用 text/plain 避免 preflight
+    while (true) {
+      const arr = loadPending();
+      // 找出可以送的(沒在重試冷卻、不是手動暫停的)
+      const next = arr.find(x => x.status === "sending");
+      if (!next) break;
+
+      // 離線就停下
+      if (!navigator.onLine) {
+        updatePending(next.id, { status: "offline", lastError: "目前離線" });
+        showSyncingIndicator(false);
+        showToast("📵 離線中,有網路時會自動補送", "error");
+        break;
+      }
+
+      showSyncingIndicator(true, "送出中...");
+      const result = await sendOne(next);
+
+      if (result.ok) {
+        // 成功 — 從佇列移除
+        removePending(next.id);
+      } else {
+        // 失敗 — 增加 attempts
+        const attempts = (next.attempts || 0) + 1;
+        if (attempts >= MAX_RETRIES) {
+          // 重試到頂,標記失敗,跳通知
+          updatePending(next.id, {
+            status: "failed",
+            attempts: attempts,
+            lastError: result.error
+          });
+          showSyncingIndicator(false);
+          showToast("✗ 送出失敗:" + result.error + " — 點右上角紅點處理", "error");
+          // 繼續處理下一筆
+          continue;
+        } else {
+          // 還能重試,顯示重試提示,等一下再戰
+          showSyncingIndicator(true, `重試 ${attempts}/${MAX_RETRIES}...`);
+          updatePending(next.id, { attempts: attempts, lastError: result.error });
+          await sleep(RETRY_DELAY);
+        }
+      }
+    }
+  } finally {
+    processingQueue = false;
+    showSyncingIndicator(false);
+  }
+}
+
+async function sendOne(item) {
+  try {
     const res = await fetch(auth.endpoint, {
       method: "POST",
       body: JSON.stringify({
         password: auth.password,
         action: "append",
-        data: data
+        data: item.data
       }),
       headers: { "Content-Type": "text/plain;charset=utf-8" }
     });
     const result = await res.json();
-
     if (result.ok) {
-      closePreview();
-      showToast("✓ 已寫入第 " + result.rowNumber + " 列", "success");
-      resetForm();
+      return { ok: true, rowNumber: result.rowNumber };
     } else {
-      showToast("送出失敗: " + (result.message || result.error), "error");
+      return { ok: false, error: result.message || result.error || "未知錯誤" };
     }
   } catch (err) {
-    showToast("網路錯誤: " + err.message, "error");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "確定送出";
+    return { ok: false, error: "網路錯誤: " + err.message };
   }
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+function showSyncingIndicator(show, text) {
+  const el = document.getElementById("syncingIndicator");
+  if (show) {
+    if (text) document.getElementById("syncingText").textContent = text;
+    el.classList.add("show");
+  } else {
+    el.classList.remove("show");
+  }
+}
+
+/* ============================
+   離線偵測 + 自動補送
+   ============================ */
+function setupOfflineDetection() {
+  const bar = document.getElementById("offlineBar");
+
+  function updateOnline() {
+    if (navigator.onLine) {
+      bar.classList.remove("show");
+      // 上線後把所有 offline 狀態的改回 sending,啟動佇列
+      const arr = loadPending();
+      let changed = false;
+      for (const item of arr) {
+        if (item.status === "offline") {
+          item.status = "sending";
+          item.attempts = 0; // 重置重試次數
+          changed = true;
+        }
+      }
+      if (changed) {
+        savePending(arr);
+        showToast("📶 已連線,自動補送中", "success");
+        processQueue();
+      }
+    } else {
+      bar.classList.add("show");
+    }
+  }
+
+  window.addEventListener("online", updateOnline);
+  window.addEventListener("offline", updateOnline);
+  updateOnline();
+}
+
+/* ============================
+   待送出資料對話框
+   ============================ */
+function openPendingModal() {
+  renderPendingList();
+  document.getElementById("pendingModal").classList.add("show");
+}
+function closePendingModal() {
+  document.getElementById("pendingModal").classList.remove("show");
+}
+
+function renderPendingList() {
+  const list = document.getElementById("pendingList");
+  const arr = loadPending();
+  list.innerHTML = "";
+
+  if (arr.length === 0) {
+    list.innerHTML = '<div class="pending-empty">沒有待送出的資料 ✨</div>';
+    document.getElementById("retryAllBtn").style.display = "none";
+    return;
+  }
+  document.getElementById("retryAllBtn").style.display = "";
+
+  for (const item of arr) {
+    const el = document.createElement("div");
+    el.className = "pending-item";
+    const t = new Date(item.createdAt);
+    const timeStr = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}`;
+    let statusLabel = "";
+    if (item.status === "sending") statusLabel = "送出中...";
+    else if (item.status === "offline") statusLabel = "📵 離線";
+    else if (item.status === "failed") statusLabel = "✗ 失敗";
+
+    el.innerHTML = `
+      <div class="meta">
+        <span>記錄於 ${timeStr}</span>
+        <span>${statusLabel}</span>
+      </div>
+      <div class="data">
+        ${item.data.date ? `<div class="row"><span class="k">補登日期</span><span class="v">${escapeHtml(item.data.date)}</span></div>` : ""}
+        <div class="row"><span class="k">金額</span><span class="v">$${escapeHtml(item.data.amount)}</span></div>
+        <div class="row"><span class="k">帳目</span><span class="v">${escapeHtml(item.data.account)}</span></div>
+        <div class="row"><span class="k">類別</span><span class="v">${escapeHtml(item.data.category)}</span></div>
+        <div class="row"><span class="k">支付</span><span class="v">${escapeHtml(item.data.payment)}${item.data.card ? " / " + escapeHtml(item.data.card) : ""}</span></div>
+        ${item.data.note ? `<div class="row"><span class="k">備註</span><span class="v">${escapeHtml(item.data.note)}</span></div>` : ""}
+        ${item.lastError ? `<div class="row"><span class="k" style="color:var(--danger);">錯誤</span><span class="v" style="color:var(--danger);">${escapeHtml(item.lastError)}</span></div>` : ""}
+      </div>
+      <div class="actions">
+        <button class="retry" onclick="retryOne('${item.id}')">重新送出</button>
+        <button class="edit" onclick="editAndRetry('${item.id}')">編輯後重送</button>
+        <button class="discard" onclick="discardOne('${item.id}')">捨棄</button>
+      </div>
+    `;
+    list.appendChild(el);
+  }
+}
+
+function retryOne(id) {
+  const item = getPending(id);
+  if (!item) return;
+  updatePending(id, { status: "sending", attempts: 0, lastError: null });
+  renderPendingList();
+  updatePendingBadge();
+  processQueue();
+}
+
+function retryAll() {
+  const arr = loadPending();
+  for (const item of arr) {
+    if (item.status !== "sending") {
+      updatePending(item.id, { status: "sending", attempts: 0, lastError: null });
+    }
+  }
+  renderPendingList();
+  processQueue();
+  showToast("已重新送出所有待處理資料", "success");
+}
+
+function editAndRetry(id) {
+  const item = getPending(id);
+  if (!item) return;
+  // 把資料填回主畫面
+  fillFormFromData(item.data);
+  // 從佇列移除
+  removePending(id);
+  closePendingModal();
+  showToast("已填回表單,可修改後再送出", "success");
+  // 滾到頂
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function discardOne(id) {
+  if (!confirm("確定要捨棄這筆紀錄嗎?捨棄後資料會永久消失。")) return;
+  removePending(id);
+  renderPendingList();
+}
+
+function fillFormFromData(data) {
+  document.getElementById("amountInput").value = data.amount || "";
+  document.getElementById("dateInput").value = data.date || "";
+
+  // 還原選擇 — 如果該值在當前選項中就直接選,否則塞到「其他」
+  selected = blankSelection();
+  selected.account = data.account || null;
+  selected.card = data.card || null;
+
+  // 對於支援「其他」的欄位,檢查是否在選項裡
+  for (const f of ["category", "payment", "note"]) {
+    const val = data[f] || "";
+    if (!val) continue;
+    if (state[f].options.includes(val)) {
+      selected[f] = val;
+    } else {
+      selected[f] = "__other__";
+      selected[f + "Custom"] = val;
+    }
+  }
+
+  renderAll();
+  updateCardVisibility();
 }
 
 function resetForm() {
