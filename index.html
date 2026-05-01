@@ -574,6 +574,471 @@
   }
   .syncing-indicator.show { display: flex; }
 
+  /* ===== 查詢頁 ===== */
+  .search-page {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 14px 100px;
+    min-height: 100vh;
+  }
+  .search-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px 14px;
+  }
+  .search-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .search-header h1 .icon {
+    color: var(--accent);
+    margin-right: 6px;
+  }
+  .search-back {
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .search-back svg {
+    width: 18px; height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* 關鍵字搜尋框 */
+  .keyword-box {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .keyword-box:focus-within {
+    border-color: var(--accent);
+  }
+  .keyword-box svg {
+    width: 18px; height: 18px;
+    fill: none;
+    stroke: var(--ink-soft);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+  }
+  .keyword-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-family: inherit;
+    background: transparent;
+    color: var(--ink);
+    min-width: 0;
+  }
+  .keyword-hint {
+    font-size: 11px;
+    color: var(--ink-soft);
+    padding: 0 6px 12px;
+    line-height: 1.5;
+  }
+  .keyword-hint code {
+    background: var(--pill-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: "Inter", monospace;
+    font-size: 11px;
+  }
+
+  /* 篩選區塊(摺疊式) */
+  .filter-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .filter-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .filter-head .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .filter-head .summary {
+    font-size: 12px;
+    color: var(--ink-soft);
+    flex: 1;
+    text-align: right;
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .filter-head .summary.has-filter {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .filter-head .chevron {
+    color: var(--ink-fade, var(--ink-soft));
+    font-size: 16px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .filter-card.open .filter-head .chevron { transform: rotate(90deg); }
+  .filter-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .filter-card.open .filter-body { max-height: 600px; overflow-y: auto; }
+  .filter-body-inner {
+    padding: 0 16px 16px;
+  }
+
+  /* 日期選項 */
+  .date-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .date-presets button {
+    background: var(--pill-bg);
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .date-presets button.active {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+  }
+  .date-range {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .date-range input {
+    flex: 1;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+  .date-range input:focus { border-color: var(--accent); }
+
+  /* 金額輸入 */
+  .amount-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .amount-row select {
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--card);
+    outline: none;
+    flex-shrink: 0;
+  }
+  .amount-row input {
+    flex: 1;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: "Inter", inherit;
+    outline: none;
+    min-width: 0;
+  }
+  .amount-row input:focus { border-color: var(--accent); }
+  .amount-row .sep { color: var(--ink-soft); font-size: 13px; }
+
+  /* 標籤式複選 */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag-list .tag {
+    background: transparent;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--ink-soft);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.12s;
+    word-break: break-word;
+  }
+  .tag-list .tag.selected {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    border-color: var(--ink);
+  }
+
+  /* 動作列 */
+  .search-actions {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0 12px;
+  }
+  .search-actions button {
+    flex: 1;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    cursor: pointer;
+  }
+  .search-actions .clear {
+    background: var(--card);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    flex: 0.5;
+  }
+  .search-actions .go {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+    box-shadow: 0 4px 12px rgba(40, 35, 28, 0.12);
+  }
+
+  /* 結果區 */
+  .results-wrap {
+    margin-top: 8px;
+  }
+  .results-summary {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .results-summary .top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .results-summary .total-amount {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: "Inter", inherit;
+    color: var(--ink);
+  }
+  .results-summary .total-count {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .results-summary .sort-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .results-summary .sort-row button {
+    background: var(--pill-bg);
+    border: none;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-family: inherit;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .results-summary .sort-row button.active {
+    background: var(--ink);
+    color: var(--pill-active-ink);
+  }
+
+  /* 分類小計 */
+  .stats-toggle {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .stats-toggle .head {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
+  }
+  .stats-toggle .head .chevron {
+    transition: transform 0.2s;
+    color: var(--ink-soft);
+  }
+  .stats-toggle.open .head .chevron { transform: rotate(90deg); }
+  .stats-toggle .body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+  .stats-toggle.open .body { max-height: 800px; }
+  .stats-section {
+    padding: 8px 16px 14px;
+    border-top: 1px solid #f5f3ec;
+  }
+  .stats-section h4 {
+    margin: 8px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stats-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px dashed #f0ede4;
+    font-size: 13px;
+  }
+  .stats-bar:last-child { border: none; }
+  .stats-bar .key { color: var(--ink); }
+  .stats-bar .val { color: var(--ink-soft); font-family: "Inter", inherit; }
+
+  /* 結果列表 - 版本 B */
+  .results-list {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .result-row {
+    border-bottom: 1px solid #f5f3ec;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-row:active { background: #f5f3ec; }
+  .result-summary {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 10px;
+    font-size: 14px;
+  }
+  .result-summary .date {
+    color: var(--ink-soft);
+    font-family: "Inter", inherit;
+    font-size: 12px;
+    width: 38px;
+    flex-shrink: 0;
+  }
+  .result-summary .cat {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+  .result-summary .note-inline {
+    color: #aeada6;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+  .result-summary .amount {
+    font-weight: 600;
+    font-family: "Inter", inherit;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .result-summary .chevron {
+    color: #c5c3bb;
+    font-size: 12px;
+    margin-left: 2px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .result-row.open .result-summary .chevron { transform: rotate(90deg); }
+  .result-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    background: #fafaf6;
+  }
+  .result-row.open .result-detail { max-height: 200px; }
+  .result-detail-inner {
+    padding: 10px 16px 14px 64px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .result-detail-inner .row { display: flex; gap: 8px; }
+  .result-detail-inner .k { width: 60px; color: var(--ink-soft); flex-shrink: 0; }
+  .result-detail-inner .v { flex: 1; color: var(--ink); word-break: break-all; }
+
+  /* 載入中 / 空狀態 */
+  .loading-block {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .loading-block .spinner {
+    width: 24px; height: 24px;
+    border: 2.5px solid var(--line);
+    border-bottom-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+    display: block;
+  }
+  .empty-block {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .empty-block .icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+
   /* ===== Setup Wizard ===== */
   .wizard {
     max-width: 460px;
@@ -803,6 +1268,9 @@
       <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.2-8.55"/><path d="M21 4v5h-5"/></svg>
       <span class="badge" id="pendingBadge">0</span>
     </button>
+    <button class="icon-btn" id="searchBtn" onclick="openSearch()" title="查詢">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
     <button class="icon-btn" id="editBtn" onclick="toggleEdit()" title="編輯選項">
       <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
     </button>
@@ -891,6 +1359,140 @@
     </div>
     <div class="pills" id="pills-note"></div>
   </div>
+
+</div>
+
+<div class="search-page hidden" id="searchPage">
+
+  <div class="search-header">
+    <button class="search-back" onclick="closeSearch()" title="返回">
+      <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <h1><span class="icon">🔍</span>查詢</h1>
+  </div>
+
+  <!-- 關鍵字搜尋(備註欄) -->
+  <div class="keyword-box">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="search" id="keywordInput" placeholder="搜尋備註..." autocomplete="off">
+  </div>
+  <div class="keyword-hint">
+    多關鍵字:<code>空格</code>=任一符合(OR)、<code>+</code>=必須全包(AND)。<br>
+    例:<code>摩斯 早餐</code> = 摩斯 OR 早餐;<code>摩斯+早餐</code> = 兩個都要有
+  </div>
+
+  <!-- 日期區間 -->
+  <div class="filter-card open" id="filter-date">
+    <div class="filter-head" onclick="toggleFilter('filter-date')">
+      <span class="name">📅 日期</span>
+      <span class="summary" id="summary-date">本月</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="date-presets">
+        <button data-preset="this_month" onclick="setDatePreset('this_month')">本月</button>
+        <button data-preset="last_month" onclick="setDatePreset('last_month')">上月</button>
+        <button data-preset="this_year" onclick="setDatePreset('this_year')">今年</button>
+        <button data-preset="all" onclick="setDatePreset('all')">全部</button>
+      </div>
+      <div class="date-range">
+        <input type="date" id="dateFromInput" onchange="onDateRangeChange()">
+        <span class="sep">~</span>
+        <input type="date" id="dateToInput" onchange="onDateRangeChange()">
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 金額 -->
+  <div class="filter-card" id="filter-amount">
+    <div class="filter-head" onclick="toggleFilter('filter-amount')">
+      <span class="name">💰 金額</span>
+      <span class="summary" id="summary-amount">不限</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="amount-row">
+        <select id="amountModeSelect" onchange="onAmountModeChange()">
+          <option value="any">不限</option>
+          <option value="eq">等於</option>
+          <option value="gte">大於等於</option>
+          <option value="lte">小於等於</option>
+          <option value="between">介於</option>
+        </select>
+        <input type="number" inputmode="numeric" id="amountAInput" placeholder="金額" oninput="updateFilterSummaries()">
+        <span class="sep" id="amountBetweenSep" style="display:none">~</span>
+        <input type="number" inputmode="numeric" id="amountBInput" placeholder="金額" style="display:none" oninput="updateFilterSummaries()">
+      </div>
+    </div></div>
+  </div>
+
+  <!-- 帳目 -->
+  <div class="filter-card" id="filter-account">
+    <div class="filter-head" onclick="toggleFilter('filter-account')">
+      <span class="name">📋 帳目</span>
+      <span class="summary" id="summary-account">全部</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="tag-list" id="tags-account"></div>
+    </div></div>
+  </div>
+
+  <!-- 類別 -->
+  <div class="filter-card" id="filter-category">
+    <div class="filter-head" onclick="toggleFilter('filter-category')">
+      <span class="name">🏷️ 類別</span>
+      <span class="summary" id="summary-category">全部</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="tag-list" id="tags-category"></div>
+    </div></div>
+  </div>
+
+  <!-- 支付方式 -->
+  <div class="filter-card" id="filter-payment">
+    <div class="filter-head" onclick="toggleFilter('filter-payment')">
+      <span class="name">💳 支付方式</span>
+      <span class="summary" id="summary-payment">全部</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="tag-list" id="tags-payment"></div>
+    </div></div>
+  </div>
+
+  <!-- 卡別 -->
+  <div class="filter-card" id="filter-card-type">
+    <div class="filter-head" onclick="toggleFilter('filter-card-type')">
+      <span class="name">🃏 卡別</span>
+      <span class="summary" id="summary-card">全部</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="tag-list" id="tags-card"></div>
+    </div></div>
+  </div>
+
+  <!-- 備註選項(常用清單) -->
+  <div class="filter-card" id="filter-note">
+    <div class="filter-head" onclick="toggleFilter('filter-note')">
+      <span class="name">📝 備註選項</span>
+      <span class="summary" id="summary-note">全部</span>
+      <span class="chevron">›</span>
+    </div>
+    <div class="filter-body"><div class="filter-body-inner">
+      <div class="tag-list" id="tags-note"></div>
+    </div></div>
+  </div>
+
+  <div class="search-actions">
+    <button class="clear" onclick="clearFilters()">清除</button>
+    <button class="go" onclick="runQuery()">查詢</button>
+  </div>
+
+  <!-- 結果 -->
+  <div class="results-wrap" id="resultsWrap"></div>
 
 </div>
 
@@ -2362,6 +2964,464 @@ function doLogout() {
   clearUnlocked();
   showLock();
 }
+
+/* ============================
+   查詢頁
+   ============================ */
+const STORAGE_SEARCH = "ql.search.v1";
+const QUERY_CACHE_TTL = 5 * 60 * 1000; // 5 分鐘
+let queryCache = null; // {key, time, response}
+
+function loadSearchState() {
+  try {
+    const s = localStorage.getItem(STORAGE_SEARCH);
+    if (s) return JSON.parse(s);
+  } catch (e) {}
+  return null;
+}
+function saveSearchState() {
+  const s = {
+    keyword: document.getElementById("keywordInput").value,
+    datePreset: searchState.datePreset,
+    dateFrom: document.getElementById("dateFromInput").value,
+    dateTo: document.getElementById("dateToInput").value,
+    amountMode: document.getElementById("amountModeSelect").value,
+    amountA: document.getElementById("amountAInput").value,
+    amountB: document.getElementById("amountBInput").value,
+    accounts: [...searchState.accounts],
+    categories: [...searchState.categories],
+    payments: [...searchState.payments],
+    cards: [...searchState.cards],
+    notes: [...searchState.notes],
+    sortBy: searchState.sortBy
+  };
+  localStorage.setItem(STORAGE_SEARCH, JSON.stringify(s));
+}
+
+let searchState = {
+  datePreset: "this_month",
+  accounts: new Set(),
+  categories: new Set(),
+  payments: new Set(),
+  cards: new Set(),
+  notes: new Set(),
+  sortBy: "date_desc",
+  preloadInflight: false
+};
+
+function openSearch() {
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("submitBar").classList.add("hidden");
+  document.getElementById("searchPage").classList.remove("hidden");
+
+  restoreSearchState();
+  renderTagLists();
+  updateFilterSummaries();
+
+  // 進查詢頁啟動預載(背景載入當前篩選條件結果)
+  triggerPreload();
+
+  // 滾到頂
+  window.scrollTo({ top: 0 });
+}
+
+function closeSearch() {
+  saveSearchState();
+  document.getElementById("searchPage").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("submitBar").classList.remove("hidden");
+}
+
+function restoreSearchState() {
+  const saved = loadSearchState();
+  if (saved) {
+    document.getElementById("keywordInput").value = saved.keyword || "";
+    document.getElementById("amountModeSelect").value = saved.amountMode || "any";
+    document.getElementById("amountAInput").value = saved.amountA || "";
+    document.getElementById("amountBInput").value = saved.amountB || "";
+    searchState.accounts = new Set(saved.accounts || []);
+    searchState.categories = new Set(saved.categories || []);
+    searchState.payments = new Set(saved.payments || []);
+    searchState.cards = new Set(saved.cards || []);
+    searchState.notes = new Set(saved.notes || []);
+    searchState.sortBy = saved.sortBy || "date_desc";
+    searchState.datePreset = saved.datePreset || "this_month";
+
+    // Q4.c:預設區間自動更新到當下;自訂區間沿用舊日期
+    if (searchState.datePreset === "custom") {
+      document.getElementById("dateFromInput").value = saved.dateFrom || "";
+      document.getElementById("dateToInput").value = saved.dateTo || "";
+      document.querySelectorAll(".date-presets button").forEach(b => b.classList.remove("active"));
+    } else {
+      applyDatePreset(searchState.datePreset);
+    }
+  } else {
+    setDatePreset("this_month");
+  }
+  onAmountModeChange();
+}
+
+function toggleFilter(id) {
+  document.getElementById(id).classList.toggle("open");
+}
+
+function setDatePreset(preset) {
+  searchState.datePreset = preset;
+  applyDatePreset(preset);
+  updateFilterSummaries();
+}
+
+function applyDatePreset(preset) {
+  const now = new Date();
+  const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  let from = "", to = "";
+  if (preset === "this_month") {
+    from = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+    to = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+  } else if (preset === "last_month") {
+    from = fmt(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+    to = fmt(new Date(now.getFullYear(), now.getMonth(), 0));
+  } else if (preset === "this_year") {
+    from = fmt(new Date(now.getFullYear(), 0, 1));
+    to = fmt(new Date(now.getFullYear(), 11, 31));
+  } else if (preset === "all") {
+    from = ""; to = "";
+  }
+  document.getElementById("dateFromInput").value = from;
+  document.getElementById("dateToInput").value = to;
+
+  document.querySelectorAll(".date-presets button").forEach(b => {
+    b.classList.toggle("active", b.dataset.preset === preset);
+  });
+}
+
+function onDateRangeChange() {
+  searchState.datePreset = "custom";
+  document.querySelectorAll(".date-presets button").forEach(b => b.classList.remove("active"));
+  updateFilterSummaries();
+}
+
+function onAmountModeChange() {
+  const mode = document.getElementById("amountModeSelect").value;
+  const a = document.getElementById("amountAInput");
+  const b = document.getElementById("amountBInput");
+  const sep = document.getElementById("amountBetweenSep");
+  if (mode === "any") {
+    a.style.display = "none";
+    b.style.display = "none";
+    sep.style.display = "none";
+  } else if (mode === "between") {
+    a.style.display = "";
+    b.style.display = "";
+    sep.style.display = "";
+    a.placeholder = "下限";
+    b.placeholder = "上限";
+  } else {
+    a.style.display = "";
+    b.style.display = "none";
+    sep.style.display = "none";
+    a.placeholder = "金額";
+  }
+  updateFilterSummaries();
+}
+
+function renderTagLists() {
+  const cfg = state;
+  renderTagsFor("account", cfg.account.options);
+  renderTagsFor("category", cfg.category.options);
+  renderTagsFor("payment", cfg.payment.options);
+  renderTagsFor("card", cfg.card.options);
+  renderTagsFor("note", cfg.note.options);
+}
+
+function renderTagsFor(field, options) {
+  const container = document.getElementById("tags-" + field);
+  if (!container) return;
+  container.innerHTML = "";
+  let selectedSet;
+  if (field === "card") selectedSet = searchState.cards;
+  else if (field === "category") selectedSet = searchState.categories;
+  else if (field === "note") selectedSet = searchState.notes;
+  else selectedSet = searchState[field + "s"];
+
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "tag" + (selectedSet.has(opt) ? " selected" : "");
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (selectedSet.has(opt)) selectedSet.delete(opt);
+      else selectedSet.add(opt);
+      btn.classList.toggle("selected");
+      updateFilterSummaries();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function updateFilterSummaries() {
+  const preset = searchState.datePreset;
+  const from = document.getElementById("dateFromInput").value;
+  const to = document.getElementById("dateToInput").value;
+  let dateText = "全部";
+  if (preset === "this_month") dateText = "本月";
+  else if (preset === "last_month") dateText = "上月";
+  else if (preset === "this_year") dateText = "今年";
+  else if (preset === "custom" && (from || to)) dateText = (from || "?") + " ~ " + (to || "?");
+  setSummary("date", dateText, dateText !== "全部");
+
+  const mode = document.getElementById("amountModeSelect").value;
+  const a = document.getElementById("amountAInput").value;
+  const b = document.getElementById("amountBInput").value;
+  let amountText = "不限";
+  if (mode === "eq" && a) amountText = "= $" + a;
+  else if (mode === "gte" && a) amountText = "≥ $" + a;
+  else if (mode === "lte" && a) amountText = "≤ $" + a;
+  else if (mode === "between" && a && b) amountText = "$" + a + " ~ $" + b;
+  setSummary("amount", amountText, amountText !== "不限");
+
+  setSummary("account", summarizeSet(searchState.accounts), searchState.accounts.size > 0);
+  setSummary("category", summarizeSet(searchState.categories), searchState.categories.size > 0);
+  setSummary("payment", summarizeSet(searchState.payments), searchState.payments.size > 0);
+  setSummary("card", summarizeSet(searchState.cards), searchState.cards.size > 0);
+  setSummary("note", summarizeSet(searchState.notes), searchState.notes.size > 0);
+}
+
+function summarizeSet(set) {
+  if (set.size === 0) return "全部";
+  if (set.size === 1) return [...set][0];
+  return `已選 ${set.size}`;
+}
+
+function setSummary(key, text, hasFilter) {
+  const el = document.getElementById("summary-" + key);
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle("has-filter", !!hasFilter);
+}
+
+function clearFilters() {
+  if (!confirm("清除所有篩選條件?")) return;
+  document.getElementById("keywordInput").value = "";
+  document.getElementById("amountModeSelect").value = "any";
+  document.getElementById("amountAInput").value = "";
+  document.getElementById("amountBInput").value = "";
+  searchState.accounts.clear();
+  searchState.categories.clear();
+  searchState.payments.clear();
+  searchState.cards.clear();
+  searchState.notes.clear();
+  setDatePreset("this_month");
+  onAmountModeChange();
+  renderTagLists();
+  updateFilterSummaries();
+  document.getElementById("resultsWrap").innerHTML = "";
+}
+
+function parseKeywords(input) {
+  if (!input) return [];
+  // 空格切 → 每段是一個 OR 群組;每群組裡用 + 切 → 全部要包含(AND)
+  const orGroups = input.trim().split(/\s+/).filter(Boolean);
+  return orGroups.map(g => g.split("+").map(t => t.trim()).filter(Boolean));
+}
+
+function buildFiltersPayload() {
+  const dateFrom = document.getElementById("dateFromInput").value;
+  const dateTo = document.getElementById("dateToInput").value;
+  const mode = document.getElementById("amountModeSelect").value;
+  const a = document.getElementById("amountAInput").value;
+  const b = document.getElementById("amountBInput").value;
+  const keyword = document.getElementById("keywordInput").value;
+
+  const filters = { sortBy: searchState.sortBy };
+  if (dateFrom) filters.dateFrom = dateFrom;
+  if (dateTo) filters.dateTo = dateTo;
+  if (searchState.accounts.size > 0) filters.accounts = [...searchState.accounts];
+  if (searchState.categories.size > 0) filters.categories = [...searchState.categories];
+  if (searchState.payments.size > 0) filters.payments = [...searchState.payments];
+  if (searchState.cards.size > 0) filters.cards = [...searchState.cards];
+  if (searchState.notes.size > 0) filters.notes = [...searchState.notes];
+  if (mode !== "any" && a) {
+    filters.amountMode = mode;
+    filters.amountA = Number(a);
+    if (mode === "between" && b) filters.amountB = Number(b);
+    else if (mode === "between") delete filters.amountMode;
+  }
+  const tokens = parseKeywords(keyword);
+  if (tokens.length > 0) filters.keywordTokens = tokens;
+
+  return filters;
+}
+
+async function runQuery() {
+  if (!navigator.onLine) {
+    showToast("離線中,無法查詢", "error");
+    return;
+  }
+
+  const filters = buildFiltersPayload();
+  saveSearchState();
+
+  const cacheKey = JSON.stringify(filters);
+  if (queryCache && queryCache.key === cacheKey && Date.now() - queryCache.time < QUERY_CACHE_TTL) {
+    renderResults(queryCache.response);
+    showToast("⚡ 使用快取結果", "success");
+    return;
+  }
+
+  const wrap = document.getElementById("resultsWrap");
+  wrap.innerHTML = `<div class="loading-block"><div class="spinner"></div>搜尋中... 大約 3-8 秒</div>`;
+
+  try {
+    const res = await fetch(auth.endpoint, {
+      method: "POST",
+      body: JSON.stringify({
+        password: auth.password,
+        action: "query",
+        filters: filters
+      }),
+      headers: { "Content-Type": "text/plain;charset=utf-8" }
+    });
+    const result = await res.json();
+    if (!result.ok) {
+      wrap.innerHTML = `<div class="empty-block"><div class="icon">⚠️</div>查詢失敗:${escapeHtml(result.message || result.error || "未知錯誤")}</div>`;
+      return;
+    }
+    queryCache = { key: cacheKey, time: Date.now(), response: result };
+    renderResults(result);
+  } catch (err) {
+    wrap.innerHTML = `<div class="empty-block"><div class="icon">⚠️</div>網路錯誤:${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function triggerPreload() {
+  if (searchState.preloadInflight) return;
+  if (queryCache && Date.now() - queryCache.time < QUERY_CACHE_TTL) return;
+  if (!navigator.onLine) return;
+
+  searchState.preloadInflight = true;
+  const filters = buildFiltersPayload();
+  const cacheKey = JSON.stringify(filters);
+  fetch(auth.endpoint, {
+    method: "POST",
+    body: JSON.stringify({
+      password: auth.password,
+      action: "query",
+      filters: filters
+    }),
+    headers: { "Content-Type": "text/plain;charset=utf-8" }
+  }).then(r => r.json()).then(result => {
+    if (result && result.ok) {
+      queryCache = { key: cacheKey, time: Date.now(), response: result };
+    }
+  }).catch(() => {}).finally(() => {
+    searchState.preloadInflight = false;
+  });
+}
+
+function renderResults(response) {
+  const wrap = document.getElementById("resultsWrap");
+  const rows = response.rows || [];
+  const stats = response.stats || { total: 0, byCategory: {}, byAccount: {}, count: 0 };
+
+  if (rows.length === 0) {
+    wrap.innerHTML = `<div class="empty-block"><div class="icon">📭</div>找不到符合條件的紀錄</div>`;
+    return;
+  }
+
+  const summaryHtml = `
+    <div class="results-summary">
+      <div class="top-line">
+        <span class="total-amount">$${formatNumber(stats.total)}</span>
+        <span class="total-count">共 ${stats.count} 筆</span>
+      </div>
+      <div class="sort-row">
+        <button class="${searchState.sortBy === 'date_desc' ? 'active' : ''}" onclick="changeSort('date_desc')">日期 ↓</button>
+        <button class="${searchState.sortBy === 'date_asc' ? 'active' : ''}" onclick="changeSort('date_asc')">日期 ↑</button>
+        <button class="${searchState.sortBy === 'amount_desc' ? 'active' : ''}" onclick="changeSort('amount_desc')">金額 ↓</button>
+        <button class="${searchState.sortBy === 'amount_asc' ? 'active' : ''}" onclick="changeSort('amount_asc')">金額 ↑</button>
+      </div>
+    </div>
+  `;
+
+  const catEntries = Object.entries(stats.byCategory).sort((a, b) => b[1] - a[1]);
+  const accEntries = Object.entries(stats.byAccount).sort((a, b) => b[1] - a[1]);
+  const statsHtml = `
+    <div class="stats-toggle" id="statsToggle">
+      <div class="head" onclick="document.getElementById('statsToggle').classList.toggle('open')">
+        <span>📊 各分類小計</span>
+        <span class="chevron">›</span>
+      </div>
+      <div class="body">
+        <div class="stats-section">
+          <h4>類別</h4>
+          ${catEntries.map(([k, v]) => `<div class="stats-bar"><span class="key">${escapeHtml(k)}</span><span class="val">$${formatNumber(v)}</span></div>`).join("")}
+        </div>
+        <div class="stats-section">
+          <h4>帳目</h4>
+          ${accEntries.map(([k, v]) => `<div class="stats-bar"><span class="key">${escapeHtml(k)}</span><span class="val">$${formatNumber(v)}</span></div>`).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+
+  const listHtml = `<div class="results-list">${rows.map(r => renderResultRow(r)).join("")}</div>`;
+
+  wrap.innerHTML = summaryHtml + statsHtml + listHtml;
+}
+
+function renderResultRow(r) {
+  // 從 effectiveDate (yyyy-MM-dd) 取出 MM/DD
+  let dateText = "";
+  if (r.effectiveDate && r.effectiveDate.length >= 10) {
+    dateText = r.effectiveDate.slice(5, 7).replace(/^0/, "") + "/" + r.effectiveDate.slice(8, 10).replace(/^0/, "");
+  }
+  const noteInline = r.note ? `<span class="note-inline">${escapeHtml(r.note)}</span>` : "";
+  const cardText = r.card ? ` / ${escapeHtml(r.card)}` : "";
+  return `
+    <div class="result-row" onclick="this.classList.toggle('open')">
+      <div class="result-summary">
+        <span class="date">${dateText}</span>
+        <span class="cat">${escapeHtml(r.category)}${noteInline}</span>
+        <span class="amount">$${formatNumber(r.amount)}</span>
+        <span class="chevron">›</span>
+      </div>
+      <div class="result-detail"><div class="result-detail-inner">
+        <div class="row"><span class="k">帳目</span><span class="v">${escapeHtml(r.account)}</span></div>
+        <div class="row"><span class="k">支付</span><span class="v">${escapeHtml(r.payment)}${cardText}</span></div>
+        ${r.note ? `<div class="row"><span class="k">備註</span><span class="v">${escapeHtml(r.note)}</span></div>` : ""}
+        <div class="row"><span class="k">記入</span><span class="v">${escapeHtml(r.timestamp)}</span></div>
+      </div></div>
+    </div>
+  `;
+}
+
+function changeSort(sortBy) {
+  searchState.sortBy = sortBy;
+  saveSearchState();
+  if (queryCache && queryCache.response && queryCache.response.rows) {
+    const rows = [...queryCache.response.rows];
+    if (sortBy === "date_desc") rows.sort((a, b) => b.effectiveTime - a.effectiveTime || b.rowNumber - a.rowNumber);
+    else if (sortBy === "date_asc") rows.sort((a, b) => a.effectiveTime - b.effectiveTime || a.rowNumber - b.rowNumber);
+    else if (sortBy === "amount_desc") rows.sort((a, b) => b.amount - a.amount);
+    else if (sortBy === "amount_asc") rows.sort((a, b) => a.amount - b.amount);
+    const newResp = { ...queryCache.response, rows };
+    renderResults(newResp);
+  } else {
+    runQuery();
+  }
+}
+
+function formatNumber(n) {
+  return Number(n).toLocaleString("en-US");
+}
+
+// 關鍵字框 Enter 觸發查詢
+document.addEventListener("DOMContentLoaded", () => {
+  const k = document.getElementById("keywordInput");
+  if (k) k.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") runQuery();
+  });
+});
 
 /* ============================
    啟動
